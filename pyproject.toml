@@ -1,0 +1,31 @@
+[project]
+name = "clippy"
+version = "0.2.0"
+description = "A URL shortening service for the Ironhack DevOps bootcamp"
+requires-python = ">=3.11,<3.14"
+readme = "README.md"
+license = { text = "MIT" }
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+ignore = ["S101"]          # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["integration: needs real PostgreSQL and Redis (set DATABASE_URL and REDIS_URL)"]
+
+[tool.coverage.run]
+source = ["api"]
+omit = ["api/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
