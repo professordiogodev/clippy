@@ -30,3 +30,8 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Tools
+.mypy_cache/
+.coverage.*
+coverage.xml
