@@ -83,18 +83,27 @@ def create_app(settings: Settings | None = None, store: Store | None = None, cac
     settings = settings or Settings.from_env()
     registry = CollectorRegistry()
     http_total = Counter("clippy_http_requests_total", "HTTP requests", ["method", "path", "status"], registry=registry)
-    http_seconds = Histogram("clippy_http_request_duration_seconds", "HTTP request duration", ["method", "path"], registry=registry)
+    http_seconds = Histogram(
+        "clippy_http_request_duration_seconds", "HTTP request duration", ["method", "path"], registry=registry
+    )
     created_total = Counter("clippy_links_created_total", "Links created", registry=registry)
-    redirects_total = Counter("clippy_redirects_total", "Redirect lookups by where the answer came from", ["source"], registry=registry)
+    redirects_total = Counter(
+        "clippy_redirects_total", "Redirect lookups by where the answer came from", ["source"], registry=registry
+    )
     stored_gauge = Gauge("clippy_links_stored", "Links currently stored", registry=registry)
-    Gauge("clippy_build_info", "Build information", ["version"], registry=registry).labels(version=settings.app_version).set(1)
+    Gauge("clippy_build_info", "Build information", ["version"], registry=registry).labels(
+        version=settings.app_version
+    ).set(1)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         configure_logging(settings.log_level, settings.log_format)
         app.state.store = store or build_store(settings.database_url)
         app.state.cache = cache or build_cache(settings.redis_url, settings.cache_ttl_seconds)
-        log.info("starting", extra={"version": settings.app_version, "store": app.state.store.kind, "cache": app.state.cache.kind})
+        log.info(
+            "starting",
+            extra={"version": settings.app_version, "store": app.state.store.kind, "cache": app.state.cache.kind},
+        )
         yield
         app.state.store.close()
         log.info("stopped")
@@ -138,13 +147,26 @@ def create_app(settings: Settings | None = None, store: Store | None = None, cac
             http_total.labels(request.method, path, str(status)).inc()
             http_seconds.labels(request.method, path).observe(elapsed)
             if path != "/metrics":
-                log.info("request", extra={"request_id": request_id, "method": request.method, "path": request.url.path,
-                                           "route": path, "status": status, "duration_ms": round(elapsed * 1000, 2)})
+                log.info(
+                    "request",
+                    extra={
+                        "request_id": request_id,
+                        "method": request.method,
+                        "path": request.url.path,
+                        "route": path,
+                        "status": status,
+                        "duration_ms": round(elapsed * 1000, 2),
+                    },
+                )
 
     @app.get("/healthz", tags=["ops"])
     def health_check() -> dict:
         """Liveness. Used by load balancers and probes; it never calls a dependency."""
-        return {"status": "ok", "version": settings.app_version, "uptime_seconds": round(time.time() - app.state.started, 2)}
+        return {
+            "status": "ok",
+            "version": settings.app_version,
+            "uptime_seconds": round(time.time() - app.state.started, 2),
+        }
 
     @app.get("/readyz", tags=["ops"])
     def readiness(response: Response) -> dict:
@@ -153,7 +175,12 @@ def create_app(settings: Settings | None = None, store: Store | None = None, cac
         ok = all(checks.values())
         if not ok:
             response.status_code = 503
-        return {"status": "ready" if ok else "not_ready", "checks": checks, "store": _store().kind, "cache": _cache().kind}
+        return {
+            "status": "ready" if ok else "not_ready",
+            "checks": checks,
+            "store": _store().kind,
+            "cache": _cache().kind,
+        }
 
     @app.post("/shorten", response_model=ShortenResponse, tags=["api"])
     def shorten_url(request: ShortenRequest) -> ShortenResponse:

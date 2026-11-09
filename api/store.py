@@ -76,7 +76,9 @@ class PostgresStore:
 
     def save(self, code: str, url: str) -> bool:
         with self._pool.connection() as conn:
-            cur = conn.execute("INSERT INTO links (code, url) VALUES (%s, %s) ON CONFLICT (code) DO NOTHING", (code, url))
+            cur = conn.execute(
+                "INSERT INTO links (code, url) VALUES (%s, %s) ON CONFLICT (code) DO NOTHING", (code, url)
+            )
             return cur.rowcount == 1
 
     def get(self, code: str) -> str | None:

@@ -24,7 +24,9 @@ def test_bad_urls_are_rejected(client, bad):
     assert "detail" in response.json()
 
 
-@pytest.mark.parametrize("good", ["https://ironhack.com", "http://localhost:8000/x?y=1#z", "https://sub.example.co.uk/a/b"])
+@pytest.mark.parametrize(
+    "good", ["https://ironhack.com", "http://localhost:8000/x?y=1#z", "https://sub.example.co.uk/a/b"]
+)
 def test_good_urls_are_accepted(client, good):
     assert client.post("/shorten", json={"url": good}).status_code == 200
 

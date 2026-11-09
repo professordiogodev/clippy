@@ -37,8 +37,8 @@ def test_metrics_expose_prometheus_text(client):
 
 def test_metrics_count_redirect_sources(client):
     code = client.post("/shorten", json={"url": "https://ironhack.com"}).json()["short_code"]
-    client.get(f"/r/{code}", follow_redirects=False)   # store, then cached
-    client.get(f"/r/{code}", follow_redirects=False)   # cache
+    client.get(f"/r/{code}", follow_redirects=False)  # store, then cached
+    client.get(f"/r/{code}", follow_redirects=False)  # cache
     client.get("/r/nope123", follow_redirects=False)
     text = client.get("/metrics").text
     assert 'clippy_redirects_total{source="store"} 1.0' in text
@@ -88,7 +88,11 @@ def test_base_url_is_used_in_short_urls(settings, store, cache):
 
     app = create_app(replace(settings, base_url="https://s.example.com"), store=store, cache=cache)
     with TestClient(app) as c:
-        assert c.post("/shorten", json={"url": "https://ironhack.com"}).json()["short_url"].startswith("https://s.example.com/r/")
+        assert (
+            c.post("/shorten", json={"url": "https://ironhack.com"})
+            .json()["short_url"]
+            .startswith("https://s.example.com/r/")
+        )
 
 
 def test_unhandled_errors_return_a_clean_500(settings, cache):

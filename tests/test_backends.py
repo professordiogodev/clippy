@@ -50,8 +50,8 @@ def test_redis_cache_get_set_and_ping(fake_redis):
 def test_a_dead_redis_never_breaks_lookups(fake_redis):
     cache = RedisCache("redis://x:6379")
     fake_redis.fail = True
-    assert cache.get("abc") is None          # degrades to a cache miss
-    cache.set("abc", "https://a.com")         # does not raise
+    assert cache.get("abc") is None  # degrades to a cache miss
+    cache.set("abc", "https://a.com")  # does not raise
     assert cache.ping() is False
 
 
