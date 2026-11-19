@@ -6,9 +6,20 @@ A small URL shortening service: the application you build DevOps infrastructure 
 
 It is deliberately simple to read and complete enough to operate. It has everything a DevOps engineer expects from a service: health and readiness endpoints, Prometheus metrics, structured logs, configuration from environment variables, optional PostgreSQL and Redis, tests, and a CI pipeline. What it does not have is a Dockerfile, Terraform, Ansible or Kubernetes manifests. Those are your job.
 
+## Requirements
+
+| You need | Why | Check it |
+|----------|-----|----------|
+| **Python 3.11 or newer** (tested on 3.12, 3.13, 3.14 and 3.15; Ubuntu 24.04 ships 3.12) | the application and its tests | `python3 --version` |
+| **`make`** | short commands for install, run and test (macOS: `xcode-select --install`; Ubuntu: `sudo apt install make`) | `make --version` |
+| **`git`** | to clone the repository | `git --version` |
+
+PostgreSQL and Redis are **optional**: without them Clippy keeps its data in memory. The `venv` folder keeps the dependencies inside the project, so nothing is installed on your whole system.
+
+> **If `make install-dev` fails** with `Could not find a version that satisfies the requirement ...`, or with a long build error: first make sure the virtual environment is active (your prompt starts with `(venv)`), and run `python --version` inside it. The dependencies are version ranges that have ready-made packages for Python 3.11 to 3.15; a much older or much newer Python may not have them. Pick a Python in that range explicitly (for example `python3.13 -m venv venv` after `brew install python@3.13`, or `sudo apt install python3.12-venv`), delete the old `venv` folder (`rm -rf venv`) and start again from the quick start. Do not use `sudo pip`.
+
 ## Quick start
 
-You need Python 3.11, 3.12 or 3.13 (Ubuntu 24.04 ships 3.12).
 
 ```bash
 git clone https://github.com/professordiogodev/clippy.git
